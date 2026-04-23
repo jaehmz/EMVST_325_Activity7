@@ -301,4 +301,21 @@ corn <- ETdat %>%
 corn_ts <- ts(corn$ET.in, start = c(2016,1), frequency = 12)
 corn_dec <- decompose(corn_ts)
 plot(corn_dec)
+# combining all 5 crops in one graph
+crops_5 <- c("Almonds","Pistachios","Fallow/Idle Cropland",
+             "Corn","Grapes (Table/Raisin)")
+# All cropps 
+ET_all <- ETdat %>%
+  filter(crop %in% crops_5) %>%
+  group_by(date, crop) %>%
+  summarise(ET.mean = mean(Ensemble.ET, na.rm = TRUE), .groups = "drop") %>%
+  mutate(date = ymd(date))
 
+ggplot(ET_all, aes(x = date, y = ET.mean, color = crop)) +
+  geom_line(linewidth = 0.9) +
+  scale_color_manual(values = c("Almonds"               = "brown",
+                                "Pistachios"            = "olivedrab4",
+                                "Fallow/Idle Cropland"  = "grey50",
+                                "Corn"                  = "goldenrod2",
+                                "Grapes (Table/Raisin)" = "mediumpurple3")) +
+  labs(title = "Monthly Evapotranspiration by Crop Type (2016–2021)", x= "Date", y = "Evapotranspiration (mm/day)", color  = "Crop") + theme_classic(base_size = 12) + theme(legend.position = "bottom")
