@@ -216,3 +216,89 @@ ggplot() +
 # Question 1
 # Transforming co2 data
 co2.trans <- 1/(co2+1000)
+
+# co2 Regression
+ghg$co2.trans <- 1 / (ghg$co2 + 1000)
+# Runoff 
+ghg$log.runoff <- log(ghg$runoff + 1)  
+# Precipitation
+ghg$log.precip <- log(ghg$precipitation) 
+# Age
+ghg$log.age    <- log(ghg$age)
+
+# multivariate regression
+mod.co2 <- lm(co2.trans ~ log.runoff + log.precip + airTemp + log.age,
+              data = ghg)
+summary(mod.co2)
+
+# checking the regression model fit assumptions 
+res.co2 <- rstandard(mod.co2)
+fit.co2 <- fitted.values(mod.co2)
+
+# Normality (qq plot)
+par(mfrow = c(1, 3))
+
+qqnorm(res.co2, pch = 19, col = "grey50")
+qqline(res.co2)
+
+# Shapiro Wilks test
+shapiro.test(res.co2)
+
+# checking resdiuals
+plot(fit.co2,res.co2, pch=19, col="grey50")
+abline(h=0)
+
+# Checking multicollinearity
+reg.data.co2 <- data.frame(
+  Log.Runoff  = ghg$log.runoff,
+  Log.Precip  = ghg$log.precip,
+  AirTemp     = ghg$airTemp,
+  Log.Age     = ghg$log.age
+)
+chart.Correlation(reg.data.co2, histogram = TRUE, pch = 19)
+
+# Question 2
+# See PDF
+
+# Question 3
+# average each crop to help decompose
+# almond (already done)
+almond <- ETdat %>%
+  filter(crop == "Almonds") %>%
+  group_by(date) %>%
+  summarise(ET.in = mean(Ensemble.ET, na.rm=TRUE))
+
+almond_ts <- ts(almond$ET.in, start = c(2016,1), frequency = 12)
+almond_dec <- decompose(almond_ts)
+plot(almond_dec)
+
+# Pistachios
+pist <- ETdat %>%
+  filter(crop == "Pistachios") %>%
+  group_by(date) %>%
+  summarise(ET.in = mean(Ensemble.ET, na.rm=TRUE))
+
+pist_ts <- ts(pist$ET.in, start = c(2016,1), frequency = 12)
+pist_dec <- decompose(pist_ts)
+plot(pist_dec)
+
+# Idle
+fallow <- ETdat %>%
+  filter(crop == "Fallow/Idle Cropland") %>%
+  group_by(date) %>%
+  summarise(ET.in = mean(Ensemble.ET, na.rm=TRUE))
+
+fallow_ts <- ts(fallow$ET.in, start = c(2016,1), frequency = 12)
+fallow_dec <- decompose(fallow_ts)
+plot(fallow_dec)
+
+# corn
+corn <- ETdat %>%
+  filter(crop == "Corn") %>%
+  group_by(date) %>%
+  summarise(ET.in = mean(Ensemble.ET, na.rm=TRUE))
+
+corn_ts <- ts(corn$ET.in, start = c(2016,1), frequency = 12)
+corn_dec <- decompose(corn_ts)
+plot(corn_dec)
+
