@@ -130,7 +130,7 @@ reg.data.improve <- data.frame(ghg$airTemp,
 chart.Correlation(reg.data.improve, histogram=TRUE, pch=19)
 
 # Question 4
-
+# See PDF
 # In class Activity Ch 7 ----
 # Reading in the data
 ETdat <- read.csv("/cloud/project/activity07/ETdata.csv")
@@ -212,7 +212,7 @@ ggplot() +
   theme_classic()+
   labs(x="year", y="Evapotranspiration (in)")
 
-# Homework Questions
+# Homework Questions ----
 # Question 1
 # Transforming co2 data
 co2.trans <- 1/(co2+1000)
@@ -319,3 +319,20 @@ ggplot(ET_all, aes(x = date, y = ET.mean, color = crop)) +
                                 "Corn"                  = "goldenrod2",
                                 "Grapes (Table/Raisin)" = "mediumpurple3")) +
   labs(title = "Monthly Evapotranspiration by Crop Type (2016–2021)", x= "Date", y = "Evapotranspiration (mm/day)", color  = "Crop") + theme_classic(base_size = 12) + theme(legend.position = "bottom")
+
+# Question 4
+# Pistachio
+# Already done copying for readability
+pist <- ETdat %>%
+  filter(crop == "Pistachios") %>%
+  group_by(date) %>%
+  summarise(ET.in = mean(Ensemble.ET, na.rm=TRUE))
+
+ggplot(pist, aes(x=ymd(date),y=ET.in))+
+  geom_point()+
+  geom_line()+
+  labs(x="year", y="Monthy evapotranspiration (in)")
+# pistachio ET time series
+pist_ts <- ts(pist$ET.in,
+              start = c(2016,1),
+              frequency= 12)
