@@ -301,6 +301,16 @@ corn <- ETdat %>%
 corn_ts <- ts(corn$ET.in, start = c(2016,1), frequency = 12)
 corn_dec <- decompose(corn_ts)
 plot(corn_dec)
+
+# Grapes 
+grape <- ETdat %>%
+  filter(crop == "Grapes (Table/Raisin)") %>%
+  group_by(date) %>%
+  summarise(ET.in = mean(Ensemble.ET, na.rm=TRUE))
+
+grape_ts <- ts(grape$ET.in, start = c(2016,1), frequency = 12)
+grape_dec <- decompose(grape_ts)
+plot(grape_dec)
 # combining all 5 crops in one graph
 crops_5 <- c("Almonds","Pistachios","Fallow/Idle Cropland",
              "Corn","Grapes (Table/Raisin)")
@@ -469,3 +479,4 @@ ggplot() +
                   ymax=Hi.95), fill=rgb(0.5,0.5,0.5,0.5))+
   theme_classic()+
   labs(x="year", y="Evapotranspiration (in)")
+
